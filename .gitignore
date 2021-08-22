@@ -1,0 +1,16 @@
+/apache-activemq-5.16.3
+/bin/*.pdb
+/bin/*.ilk
+/test/consumer/x64
+/test/consumer/*.user
+/test/consumer/*.sln
+/test/consumer/*.vcxproj
+/test/consumer/*.filters
+/test/producer/x64
+/test/producer/*.filters
+/test/producer/*.user
+/test/producer/*.sln
+/test/producer/*.vcxproj
+/bin/*.exe
+/test/consumer/.vs
+/test/producer/.vs
