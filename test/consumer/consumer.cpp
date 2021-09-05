@@ -1,5 +1,4 @@
 ﻿#include "consumer.h"
-
 SimpleAsyncConsumer:: SimpleAsyncConsumer(const std::string& brokerURI,
     const std::string& destURI,
     bool useTopic/* = false*/,
@@ -71,23 +70,76 @@ void SimpleAsyncConsumer::runConsumer()
 void SimpleAsyncConsumer::onMessage(const Message* message)
 {
     static int count = 0;
+    string text = "";
+    int     cnt;
+    unsigned char uc;
+    char ch;
+    vector<unsigned char>vec_bytes;
+
     try {
         count++;
-        const TextMessage* textMessage = dynamic_cast<const TextMessage*>(message);
-        string text = "";
+        const MapMessage* mapMessage = dynamic_cast<const MapMessage*>(message);
 
-        if (textMessage != NULL) {
-            text = textMessage->getText();
+        if (mapMessage->isEmpty())
+        {
+            printf("message is empty\n");
+            return;
         }
-        else {
-            text = "NOT A TEXTMESSAGE!";
+
+        /*enum ValueType {
+            NULL_TYPE = 0,
+            BOOLEAN_TYPE = 1,
+            BYTE_TYPE = 2,
+            CHAR_TYPE = 3,
+            SHORT_TYPE = 4,
+            INTEGER_TYPE = 5,
+            LONG_TYPE = 6,
+            DOUBLE_TYPE = 7,
+            FLOAT_TYPE = 8,
+            STRING_TYPE = 9,
+            BYTE_ARRAY_TYPE = 10,
+            UNKNOWN_TYPE = 11
+        };*/
+
+        auto vec = mapMessage->getMapNames();
+        for (auto iter : vec)
+        {
+            Message::ValueType value_type = mapMessage->getValueType(iter);
+            switch (value_type)
+            {
+            case 2:
+                uc = mapMessage->getByte(iter);
+                break;
+            case 3:
+                ch = mapMessage->getChar(iter);
+                break;
+            case 5:
+                cnt = mapMessage->getInt(iter);
+                break;
+            case 9:
+                text = mapMessage->getString(iter);
+                break;
+            case 10:
+                vec_bytes = mapMessage->getBytes(iter);
+                break;
+            default:
+                break;
+            }
         }
+        printf("Message #%d Received string:%s char:%c byte:%02x int:%d ", \
+            count, text.c_str(), ch, uc, cnt);
+
+        for (auto iter1 : vec_bytes)
+        {
+            printf("%02x,", iter1);
+        }
+        printf("\n");
 
         if (clientAck) {
             message->acknowledge();
         }
 
-        printf("Message #%d Received: %s\n", count, text.c_str());
+        
     }
     catch (CMSException& e) {
         e.printStackTrace();

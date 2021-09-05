@@ -48,7 +48,7 @@ void run_consumer()
     // Note in the code above that this causes createTopic or
     // createQueue to be used in the consumer.
     //============================================================
-    bool useTopics = true;
+    bool useTopics = false;
 
     //============================================================
     // set to true if you want the consumer to use client ack mode

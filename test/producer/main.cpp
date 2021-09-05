@@ -126,7 +126,7 @@ void run_producer()
     // Note in the code above that this causes createTopic or
     // createQueue to be used in the producer.
     //============================================================
-    bool useTopics = true;
+    bool useTopics = false;
     // Create the producer and run it.
     SimpleProducer producer(brokerURI, numMessages, destURI, useTopics);
 

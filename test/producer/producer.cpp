@@ -1,4 +1,5 @@
 #include "producer.h"
+//#include <sstream>
 
 SimpleProducer::SimpleProducer(const std::string& brokerURI, unsigned int numMessages,
     const std::string& destURI, bool useTopic/* = false*/, bool clientAck/* = false*/) :
@@ -60,24 +61,32 @@ void SimpleProducer::run()
         producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
         // Create the Thread Id String
-        string threadIdStr = Long::toString(Thread::currentThread()->getId());
+        int cnt             { 0 };
+        char ch             { 'A' };
+        string threadIdStr  { Long::toString(Thread::currentThread()->getId()) };
+        vector<unsigned char> vec{0x01,0x02,0x03};
+        unsigned char uc = 0x05;
 
         // Create a messages
-        string text = (string)"Hello world! from thread " + threadIdStr;
+        //string text = (string)"Hello world! from thread " + threadIdStr;
+        while (1)
+        {
+            string text = "hello world" + to_string(++cnt);
 
-        for (unsigned int ix = 0; ix < numMessages; ++ix) {
-            TextMessage* message = session->createTextMessage(text);
+            MapMessage* message = session->createMapMessage();
+            message->setString("producer", text);
+            message->setInt("int", cnt);
+            message->setByte("set_byte", uc);
+            message->setBytes("set_bytes", vec);
+            message->setChar("set_char",ch);
 
-            message->setIntProperty("Integer", ix);
-
-            // Tell the producer to send the message
-            printf("Sent message #%d from thread %s\n", ix + 1, threadIdStr.c_str());
             producer->send(message);
-
             delete message;
             Sleep(1500);
-        }
 
+
+
+        }
     }
     catch (CMSException& e) {
         e.printStackTrace();
